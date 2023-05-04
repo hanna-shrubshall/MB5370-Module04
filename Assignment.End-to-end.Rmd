@@ -1,0 +1,15 @@
+---
+title: "Assignment.End-to-end"
+output: html_document
+date: "2023-05-04"
+Author: Hanna Shrubshall 
+---
+##Assignment. ENd-to-end data analysis in R 
+The following code is for the assignment using data from QFISH. 
+
+*Note to self remember when copying path of file that the \ have to be changed to /
+
+```{r}
+read.csv("E:/github/MB5370-Module04/data/export.csv")
+```
+

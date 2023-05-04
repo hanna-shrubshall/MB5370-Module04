@@ -10,6 +10,33 @@ The following code is for the assignment using data from QFISH.
 *Note to self remember when copying path of file that the \ have to be changed to /
 
 ```{r}
-read.csv("E:/github/MB5370-Module04/data/export.csv")
+install.packages("usethis")
+library(usethis)
+use_git_config(user.name = "hanna-shrubshall", user.email = "hanna.shrubshall@gmail.com")
+Sharks <- read.csv("E:/github/MB5370-Module04/data/export.csv")
+```
+
+#Loading the required packages to create my plot 
+```{r}
+library(tidyverse) #this is for ggplot 
+library(viridis) #this is for a differnet colour scheme 
+library(hexbin)
+```
+
+#Cleaning up the data in R
+- the following code is used to clean up the data so it is easier for R to read and easier to manipulate to place into a plot 
+- Firstly you need to have Hmisc installed and downloaded into R
+- Make a copy of the dataset 
+
+```{r}
+#install.packages("Hmisc")
+library("Hmisc")
+
+shark1 <- Sharks 
+```
+
+###Changing the labels/headers of the data 
+```{r}
+label(shark1) #this checks the labels of the data 
 ```
 

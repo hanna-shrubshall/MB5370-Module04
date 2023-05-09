@@ -970,3 +970,42 @@ stop("!") %>%
   tryCatch(error = function(e) "An error")
 ```
 
+----------------------------------------------------------
+##6.0 Workshop 5: Spatial data in R 
+
+##6.4 Installing the spatial R packages 
+```{r}
+#install necessary packages
+install.packages("sf")
+install.packages("terra")
+install.packages("leaflet")
+install.packages("tmap")
+#load into R library
+library(tidyverse)
+library(sf)
+library (terra)
+library(leaflet)
+library(tmap)
+library(mgcv)
+```
+
+##6.5 Introduction to the problem 
+https://www.seascapemodels.org/spatial-analysis-in-r/spatial-analysis-in-r.html)
+
+##6.6 Loading the spatial dataset 
+```{r}
+#load the copepod data into R studio
+library(readr)
+dat <- read_csv("data-for-course/copepods_raw.csv")
+dat
+```
+
+##6.7 Data exploration 
+###6.7.1 Check Coordinates 
+```{r}
+library(ggplot2)
+ggplot(dat) + 
+  aes(x = longitude, y = latitude, color = richness_raw) +
+  geom_point()
+```
+

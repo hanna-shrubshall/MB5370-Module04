@@ -18,77 +18,67 @@ mpg
 ```
 ##2.6 Create your first ggplot 
 - ggplot() creates a coordinate system   that you can add layers to 
-- the function "data =" is where you     input your dataset being used for the   plot
-- geom_point() addds a layer of points   to your plots which creates a          scatterplot. 
+- the function "data =" is where you     input your dataset being used for the plot
+- geom_point() addds a layer of points   to your plots which creates a scatterplot. 
 ```{r}
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy))
 ```
 ##2.7 Understand the 'grammar of graphics' 
 ###2.7.1 Graphing template 
-- A general template for ggplot is to 'call ggplot, offer it data, then provide a geom function with a collection of mappings, which dictate how you plot will look' 
-- The template is below 
+A general template for ggplot is to 'call ggplot, offer it data, then provide a geom function with a collection of mappings, which dictate how you plot will look' 
 ```{r}
-ggplot(data = <DATA>) + 
-  <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+#GGPLOT TEMPLATE 
+#ggplot(data = <DATA>) + 
+#  <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
 ```
 
 ###2.7.2 Aesthetic mappings 
 - This refers to the size, shape and colour of data points 
 - You need to attributes of a plot a geom and aesthetic 
-Example, change point colour by class: 
 ```{r}
+#change point colour by class
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy, colour = class))
-```
-Example, change point size by class: 
-NOTE: Using size for a discrete variable is not advised. 
-```{r}
+
+#Change point size by class
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy, size = class))
-```
-Example, change point transparency by class (alpha):
-- The alpha aesthetic is whats changing transparency 
-```{r}
+
+#Change point transparency by class (alpha)
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy, alpha = class))
-```
-Example, change point shape by class: 
-```{r}
+
+#change point shape by class
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy, shape = class))
-```
 
-Examples, things can also be set manually, like points colour: 
-```{r}
+#set colour manually
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy), color = "purple")
-```
-Example question to try: What happens if you map an aesthetic to something other than a variable na,e, like aes(colour = displ <5)? 
-- It's interesting to note that any number above 5 is coloured orange, where as any colour below 5 is coloured blue. 
-```{r}
+
+#What happens if you map an aesthetic to something other than a variable na,e, like aes(colour = displ <5)? 
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy, colour = displ <5))
+#It's interesting to note that any number above 5 is coloured orange, where as any colour below 5 is coloured blue. 
 ```
+
 ##2.9 Facet and panel plots 
-- This section allows you to develop separate plots for a range of reasons, most often to show a subset of data
-- The function used for this is facet_wrap()
+This section allows you to develop separate plots for a range of reasons, most often to show a subset of data
 ```{r}
+#Using facet wrap
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy))+ facet_wrap(~class,nrow = 2)
-```
-Example with more than one variable: 
-- Function is facet_grid()
-- Use ~ to separate variables 
-```{r}
+
+#Facet grid (more than one variable, using ~ to seperate variables)
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy))+ facet_grid(drv~cyl)
-```
-Example using a . to produce plots without rows or column dimensions: 
-```{r}
+
+#using a . to produce plots without rows or column dimensions
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy))+ facet_grid(.~cyl)
 ```
+ 
 Exercise: 
 What does nrow do? 
 This dictates the number of rows there are 
@@ -99,64 +89,47 @@ The function as.table lays the facets out as a table if TRUE with the highest va
 
 ##2.10 Fitting simple lines
 ```{r}
+#Original plot
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy)) 
-```
-Example, display the same data as a smooth line fir through the points using geom_smooth()
-```{r}
+
+# display the same data as a smooth line fir through the points using geom_smooth()
 ggplot(data = mpg) + 
   geom_smooth(mapping = aes(x = displ, y = hwy))
-```
-```{r}
-ggplot(data = mpg) + 
-#  geom_point(mapping = aes(x = displ, y = hwy))#points horrible
-  geom_smooth(mapping = aes(x = displ, y = hwy))#try mooth line
-```
 
-Example, changing the line type: 
-```{r}
+#changing the line type
 ggplot(data = mpg) + 
   geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv))
-```
 
-Example, set a group aesthetic to a categorical variable to draw multiple objects: 
-- using a group argument to show that the data is in fact grouped - it won't add a new legend but can easily be used to vary your plots by discrete variables. 
-```{r}
+#set a group aesthetic to a categorical variable to draw multiple objects
 ggplot(data = mpg) + 
   geom_smooth(mapping = aes(x = displ, y = hwy, group = drv))
-```
-Example, change the colour of each line based on drv value: 
-```{r}
+
+#change the colour of each line based on drv value
 ggplot(data = mpg) + 
   geom_smooth(mapping = aes(x = displ, y = hwy, colour = drv), show.legend = FALSE)
-```
 
-Example, plotting multiple geoms on the single plot: 
-```{r}
+#Plotting multiple geoms on the single plot
 ggplot(data = mpg) + 
   geom_smooth(mapping = aes(x = displ, y = hwy))+
   geom_point(mapping = aes(x = displ, y = hwy))
-```
 
-Example, creating the same plot as above, BUT in a more effcient manner: 
-```{r}
+#creating the same plot as above, BUT in a more efficient manner
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy))+
   geom_point()+
   geom_smooth()
-```
 
-Example, using mappings in specific layers to enable the display of different aesthetics in different layers: 
-```{r}
+#using mappings in specific layers to enable the display of different aesthetics in different layers
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy))+
   geom_point(mapping = aes(color = class))+
   geom_smooth()
-```
 
-Example, specify different data for each layer, here a filter is used to select a subset of data and plot only that subset (class = "subcompact"): 
-```{r}
+#specify different data for each layer, here a filter is used to select a subset of data and plot only that subset (class = "subcompact")
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy))+
   geom_point(mapping = aes(color = class))+
   geom_smooth(data = filter(mpg, class =="subcompact"), se = FALSE)
+
+
 ```
 
 Exercise:
@@ -181,31 +154,30 @@ ggplot() +
   geom_point(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_smooth(data = mpg, mapping = aes(x = displ, y = hwy))
 ```
+
 ##2.11 Transformations and Stats
 The following is going to be using a different data set 
 - The diamonds dataset comes in ggplot2 and contains information about ~54,000 diamonds, including the price, carat, color, clarity and cut of each diamond 
-
-###2.11.1 Plotting statistics
-```{r}
-ggplot(data = diamonds) + 
-  geom_bar(mapping = aes(x = cut))
-```
-
 - bar charts, histograms, and frequency polygons bin your data and then plot bin counts, the number of points that fall in each bin.
 - smoothers fit a model to your data and then plot predictions from the model.
 - boxplots compute a robust summary of the distribution and then display a specially formatted box.
 
 The algorithm used to calculate new values for a graph is called a stat, short for statistical transformation. 
 
-Example, using geoms and stats interchangeably: 
+###2.11.1 Plotting statistics
 ```{r}
+#Adding a ggplot dataset
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut))
+
+#Using geoms and stats interchangeably
 ggplot(data = diamonds) + 
   stat_count(mapping = aes(x = cut))
 ```
-###2.11.2 Overriding defaults in ggpplot2
 
-Example, understanding how to override a default stat: 
+###2.11.2 Overriding defaults in ggpplot2
 ```{r}
+#understanding how to override a default stat
 demo <- tribble(
   ~cut,         ~freq,
   "Fair",       1610,
@@ -218,15 +190,15 @@ demo
 
 ggplot(data = demo) +
   geom_bar(mapping = aes(x = cut, y = freq), stat = "identity")
-```
-Example, overriding a default mapping from transformed variables to aesthetics (displaying a bar chart of proportion of your total diamond data set rather than a count): 
-```{r}
+
+#overriding a default mapping from transformed variables to aesthetics (displaying a bar chart of proportion of your total diamond data set rather than a count)
 ggplot(data = diamonds) + 
   geom_bar(mapping = aes(x = cut, y = after_stat(prop), group = 1))
 ```
+
 ###2.11.3 Plotting statistical details 
-Example, understanding more about these transformations in your plot: using stat_summary()
 ```{r}
+#understanding more about these transformations in your plot: using stat_summary()
 ggplot(data = diamonds) + 
   stat_summary(
     mapping = aes(x = cut, y = depth),
@@ -234,29 +206,15 @@ ggplot(data = diamonds) +
     fun.max = max,
     fun = median
   )
-```
-Example, you need to set the group = x number, otherwise the plots data will be represented as the same. 
-```{r}
+
+#you need to set the group = x number, otherwise the plots data will be represented as the same
 ggplot(data = diamonds) + 
   geom_bar(mapping = aes(x = cut, y = after_stat(prop)))
 ggplot(data = diamonds) + 
   geom_bar(mapping = aes(x = cut, fill = color, y = after_stat(prop)))
 ```
+
 ##2.12 Positional adjustments 
-Example using colour or fill to change aspects of bar colours 
-- The first graph has coloured borders where as the second is filled in 
-```{r}
-ggplot(data = diamonds) + 
-  geom_bar(mapping = aes(x = cut, colour = cut))
-ggplot(data = diamonds) + 
-  geom_bar(mapping = aes(x = cut, fill = cut))
-```
-Example, using these aesthetics to colour by clarity: 
-- the stacking is done automatically 
-```{r}
-ggplot(data = diamonds) + 
-  geom_bar(mapping = aes(x = cut, fill = clarity))
-```
 Position adjustments allow you to customise plots in 3 ways: 
 1. identity (raw data)
 2. fill (changes in heights)
@@ -264,6 +222,16 @@ Position adjustments allow you to customise plots in 3 ways:
 
 - position = "identity" means you can place each object exactly where it falls in the context of the graph (good for scatter plots)
 ```{r}
+#using colour or fill to change aspects of bar colours 
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, colour = cut))
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = cut))
+
+#using these aesthetics to colour by clarity: 
+ggplot(data = diamonds) + 
+  geom_bar(mapping = aes(x = cut, fill = clarity))
+
 #To alter transparency (alpha)
 ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) + 
   geom_bar(alpha = 1/5, position = "identity")
@@ -271,50 +239,45 @@ ggplot(data = diamonds, mapping = aes(x = cut, fill = clarity)) +
 #To color the bar outlines with no fill color
 ggplot(data = diamonds, mapping = aes(x = cut, colour = clarity)) + 
   geom_bar(fill = NA, position = "identity")
-```
-Example, position = "fill" makes each stacked bar the same height: 
-```{r}
+
+#position = "fill" makes each stacked bar the same height
 ggplot(data = diamonds) + 
   geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill")
-```
-Example, position = "dodge" places overlapping objects directly BESIDE one another 
-```{r}
+
+#position = "dodge" places overlapping objects directly BESIDE one another 
 ggplot(data = diamonds) + 
   geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge")
-```
-Example, position = "jitter" adds a small amount of random noise to each point to avoid overplotting when points overlap (useful for scatterplots, not bar graphs)
-```{r}
+
+#position = "jitter" adds a small amount of random noise to each point to avoid overplotting when points overlap (useful for scatterplots, not bar graphs)
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy), position = "jitter")
+
+#
 ```
+
 ##2.13 The layered grammar of graphics 
-This is the template for creating ggplots 
 ```{r}
-ggplot(data = <DATA>)+ 
-  <GEOM_FUNCTION>(
-     mapping = aes(<MAPPINGS>)),
-     stat = (<STAT>), 
-     position = (<POSITION>) +
-  <FACET_FUNCTION>
+#CREATING GGPLOT TEMPLATE
+#ggplot(data = <DATA>)+ 
+ # <GEOM_FUNCTION>(
+ #    mapping = aes(<MAPPINGS>)),
+  #   stat = (<STAT>), 
+  #   position = (<POSITION>) +
+ # <FACET_FUNCTION>
  
 ```
 ----------------------------------------------------
 
 ##Workshop 3: Ussing ggplot2 for communication 
 ##3.1 Labels 
-Example, adding labels to ggplots are important for communicating what you are plotting. This eaxmple is inputting a title:
 ```{r}
+#adding labels to ggplots are important for communicating what you are plotting. This eaxmple is inputting a title
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = class)) +
   geom_smooth(se = FALSE) +
   labs(title = "Fuel efficiency generally decreases with engine size")
-```
 
-Example, adding more text: 
-- subtitle adds additional detail in a smaller font beneath the title and caption adds text at the bottom right of the plot 
-- caption adds text at the bottom right of the plot, often used to describe the source of the
-data.
-```{r}
+#adding more text
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = class)) +
   geom_smooth(se = FALSE) +
@@ -323,10 +286,8 @@ ggplot(mpg, aes(displ, hwy)) +
     subtitle = "Two seaters (sports cars) are an exception because of their light weight",
     caption = "Data from fueleconomy.gov"
   )
-```
 
-Example using labs() to replace axis label and legend titles: 
-```{r}
+#using labs() to replace axis label and legend titles
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(colour = class)) +
   geom_smooth(se = FALSE) +
@@ -343,8 +304,8 @@ Adding text to the plot itself.
 - geom_point(), rather than a shape geometry it can add a label. 
 - the "nudge()" function can be used to mave certain text around so that it isn't overlapping 
 
-Example, adding a label that calls in the values from the data frame: 
 ```{r}
+#adding a label that calls in the values from the data frame
 best_in_class <- mpg %>%
   group_by(class) %>%
   filter(row_number(desc(hwy)) == 1)
@@ -355,95 +316,79 @@ ggplot(mpg, aes(displ, hwy)) +
 ```
 
 ##3.3 Scales 
-ggplot2 automatically adds scales for you as seen below: 
+
 ```{r}
+#ggplot2 automatically adds scales for you as seen below: 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(colour = class))
-```
-To tweak the scales you can do it by offering values to the scale parameters: 
-- if you just add a number in the scale_x_continuous() brackets it only changes the label. But if you add in the breaks=seq then you can change the scale 
-```{r}
+
+#Tweaking scales
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(colour = class)) +
   scale_x_continuous(breaks = seq(0, 10, by = 1)) +
   scale_y_continuous(breaks = seq(15, 50, by = 5)) +
   scale_colour_discrete(10)
 ```
+
 ##3.4 Axis ticks 
-Example changing the ticks on the axes: 
 ```{r}
+#changing the ticks on the axes
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   scale_y_continuous(breaks = seq(15, 40, by = 5))
 ```
+
 ##3.5 legens and colour schemes 
-Example, changing the position of the legend using theme(): 
-- Can also use legend.position = "none" to supress the display of the legend altogether 
 ```{r}
+#changing the position of the legend using theme()
 base <- ggplot(mpg, aes(displ, hwy))+
   geom_point(aes(colour = class))
-
 base + theme(legend.position = "left")
-```
 
-```{r}
+#can use this and change the position as a way to change the location of the legend
 base <- ggplot(mpg, aes(displ, hwy))+
   geom_point(aes(colour = class))
-base + theme(legend.position = "top")#can use this and change the position as a way to change the location of the legend
+base + theme(legend.position = "top")
 ```
+
 ##3.6 Replacing a scale 
 There are two types of scales that are most likely going to be used: contiuous position scales and colour sclaes 
-
-Example, using logtransform to easily visualise data: 
 ```{r}
+#using logtransform to easily visualise data
 ggplot(diamonds, aes(carat, price))+
   geom_bin2d()+ 
   scale_x_log10(5)+ 
   scale_y_log10(10)
-```
 
-Example, changing the colour scale: 
-```{r}
+#changing the colour scale
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = drv))
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = drv)) +
   scale_colour_brewer(palette = "Set1")
-```
 
-Example, adding a redundant shape mapping (this helps to ensure the plot is interpretable in black and white): 
-```{r}
+#adding a redundant shape mapping (this helps to ensure the plot is interpretable in black and white)
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = drv, shape = drv)) +
   scale_colour_brewer(palette = "Set1")
-```
 
-Colours  http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/ 
-- the above website is for more colour options off colorbrewer 
-
-When there are predefined colours that you want to use the function scale_colour_manual() can be used:
-
-```{r}
+#predefined colours that you want to use the function scale_colour_manual() can be used
 presidential %>%
   mutate(id = 33 + row_number()) %>%
   ggplot(aes(start, id, colour = party)) +
     geom_point() +
     geom_segment(aes(xend = end, yend = id)) +
     scale_colour_manual(values = c(Republican = "red", Democratic = "blue"))
-```
 
-Another colour scheme used is the viridis colour scheme: scale_colour_viridis()
-- downloading the viridis package 
-```{r}
-install.packages('viridis')
-install.packages('hexbin')
+#viridis colour scheme: scale_colour_viridis(), downloading the viridis package 
+#install.packages('viridis')
+#install.packages('hexbin')
 library(viridis)
 library(hexbin)
-```
 
-```{r}
-df <- tibble( # note we're just making a fake dataset so we can plot it
+#creating a fake dataset to plot
+df <- tibble( 
   x = rnorm(10000),
   y = rnorm(10000)
 )
@@ -460,41 +405,33 @@ ggplot(df, aes(x, y)) +
 ##3.7 Themes 
 Customising the entire theme of your plot 
 - ggplot has 8 themes by default 
-Example, the below graph is the BLACK AND WHITE, dark on light ggplot2 theme 
+ 
 ```{r}
+#graph is the BLACK AND WHITE, dark on light ggplot2 theme
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = class)) +
   geom_smooth(se = FALSE) +
   theme_bw()
-```
 
-Example, the below graph has LIGHT GRAY lines and axes, to direct more attention to the data. 
-```{r}
+#LIGHT GRAY lines and axes, to direct more attention to the data
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = class)) +
   geom_smooth(se = FALSE) +
   theme_light()
-```
-Example, the graph below is a CLASSIC theme with the x and y axis lines and no gridlines: 
 
-```{r}
+#CLASSIC theme with the x and y axis lines and no gridlines
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = class)) +
   geom_smooth(se = FALSE) +
   theme_classic()
-```
 
-Example, the graph below is the DARK THEME  
-```{r}
+#graph below is the DARK THEME 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = class)) +
   geom_smooth(se = FALSE) +
   theme_dark()
-```
 
-Example, you can develop your own themes by setting more arguments: 
-- This is an example of one that has been tailored. 
-```{r}
+#can develop your own themes by setting more arguments (Nick's example)
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = class)) +
   geom_smooth(se = FALSE) +
@@ -552,36 +489,21 @@ This is the function that pushes your changes to the remote server
 - The tibble package is part of the tidyverse package 
 
 ##5.3 WHat is a tibble? 
-
+- R packages use regular data frames. To turn said regular data frames into tibbles you can use the function as_tibble().
+- You can also create a new tibble from individual vectors using tibble(). This will automatically recycle inputs of length 1, and allows you to refer to variables that you just created. 
+*NOTE, tibble() does not change input types, names of variables or create row names
 ```{r}
 library("tidyverse")
-```
-- R packages use regular data frames. To turn said regular data frames into tibbles you can use the function as_tibble(). 
-
-```{r}
 as_tibble(iris)
-```
 
-- You can also create a new tibble from individual vectors using tibble(). This will automatically recycle inputs of length 1, and allows you to refer to variables that you just created. 
-
-*NOTE, tibble() does not change input types, names of variables or create row names
-Example below: 
-
-```{r}
+#example tibble
 tibble(
   x = 1:5, 
   y = 1, 
   z = x ^ 2 + y
 )
-```
 
-Tibbles can have non-syntactic names (which aren't valied in R).
-- For example names with spaces or containing special characters
-If there are non-syntatic variables in your tibble, you'll need to refer to them  with backsticks. 
-*NOTE, you'll need these backsticks for these variables when using other packages such as ggplot2, dplyr, tidyr, etc. 
-Example below: 
-
-```{r}
+#non-syntactic names in tibble allowed (refer these names with a backstick `)
 tb <- tibble(
   `:)` = "smile",
   ` ` = "space", 
@@ -589,27 +511,14 @@ tb <- tibble(
 )
 tb
 
-```
-
-Another way to create a tibble is with the function tribble() (meaning transposed tibble). 
-- This is a customised way for data entry in code: column headings are defined by formulas, and entries are separated by commas
-Example below: 
-
-```{r}
+#Tribble another way to create a tibble 
 tribble(
    ~x, ~y, ~z,
   #Header
   "a", 2, 3.6,
   "b", 1, 8.5
 )
-```
 
-What is the difference between tibbles and data.frame? 
-- Tibbles print the first 10 rows and all columns that can fit on screen 
-- Tibbles also print the type of each data next to its name (character, string, numeric, etc). 
-- Tibbles help your console from getting overwhelmed by printing massive data frames. 
-
-```{r}
 tibble(
   a = lubridate::now() + runif(1e3) * 86400,
   b = lubridate::today() + runif(1e3) * 30,
@@ -617,32 +526,14 @@ tibble(
   d = runif(1e3),
   e = sample(letters, 1e3, replace = TRUE)
 )
-```
 
-However, sometimes you need to alter the default display. 
-- Print() can be used to designate the number of ros (n) and display width (width = Inf #displays every column). 
-
-Example below: 
-
-```{r}
+#alter default display 
 install.packages("nycflights13")
 library("nycflights13")
 nycflights13::flights %>% 
   print(n = 10, width = Inf)
-```
 
-You can also control the default print behaviour by setting options: 
-- options(tibble.print_max = n, tibble.print_min = m): if more then n rows, print only m rows
-- Use options(tibble.print_min = Inf) to always show all rows.
--Use options(tibble.width = Inf) to always print all columns, regardless of the width of the screen.
--Use R’s built-in viewer with View()
--You can see a complete list of options by looking at the package help with package?tibble.
-
-SOme tools are needed for pulling out single variables from our data frame. [[ extracts by name or position and $ extracts only by name. 
-
-Example below: 
-
-```{r}
+#You can also control the default print behaviour by setting options
 df <- tibble(
   x = runif(5),
   y = rnorm(5)
@@ -656,31 +547,29 @@ df[["x"]]
 # Extract by position
 df[[1]]
 
-```
-
-Need to use a . as a place holder if we want to use these tools in a pipe (%>%). 
-Example below: 
-
-```{r}
+#Need to use a . as a place holder if we want to use these tools in a pipe (%>%)
 df %>% .$x
 df %>% .[["x"]]
-```
 
-Compare and contrast the following operations on a data.frame and equivalent tibble. What is different? Why might the default data frame behaviours cause you frustration?
-
-```{r}
+#Compare and contrast the following operations on a data.frame and equivalent tibble. What is different? Why might the default data frame behaviours cause you frustration?
 df <- data.frame(abc = 1, xyz = "a")
 df$x
 df[, "xyz"]
 df[, c("abc", "xyz")]
-```
 
-```{r}
 df <- tibble(abc = 1, xyz = "a")
 df$x
 df[, "xyz"]
 df[, c("abc", "xyz")]
+
+
 ```
+
+What is the difference between tibbles and data.frame? 
+- Tibbles print the first 10 rows and all columns that can fit on screen 
+- Tibbles also print the type of each data next to its name (character, string, numeric, etc). 
+- Tibbles help your console from getting overwhelmed by printing massive data frames. 
+
 
 
 ##5.4 How can I import data? 
@@ -696,17 +585,12 @@ Most important argument to read_csv() is the file path.
 - when you run read_csv() it prints out a column specification that gives the name and type of each column 
 
 ```{r}
+#using read_csv()
 read_csv("a,b,c
 1,2,3
 4,5,6")
-```
-*NOTE read_csv() uses the first line of data as the column names 
 
-You may not want the first line of data to be the column names hence you might want to skip these lines. 
-- Use function skip = n (where n is the number of lines you want to skip over). 
-- Alternativey, use comment = '#' it will drop all lines starting with a # or whatever character you designate 
-
-```{r}
+#Using read_csv() and changing the default 
 read_csv("The first line of metadata
   The second line of metadata
   x,y,z
@@ -715,28 +599,14 @@ read_csv("The first line of metadata
 read_csv("# A comment I want to skip
   x,y,z
   1,2,3", comment = "#")
-```
 
-Another reason to adjust the read_csv() default is if your data does not have column names. 
-- Use col_names = FALSE (this tells read_csv() not to treat the first row as headings, but to label them sequentially instead from X1 to Xn)
-
-*NOTE \n is a shortcut to add a new line
-
-Example below: 
-
-```{r}
+#changing the default if your data has no column names 
 read_csv("1,2,3\n4,5,6", col_names = FALSE)
-```
 
-You can also pass col_names a character vector to be used as the column names:
-
-```{r}
+#pass col_names a character vector to be used as the column names
 read_csv("1,2,3\n4,5,6", col_names = c("Bob", "Charlie", "Sam"))
-```
 
-Another option that commonly needs tweaking is na: this specifies the value (or values) that are used to represent missing values in your file:
-
-```{r}
+#na: this specifies the value (or values) that are used to represent missing values in your file
 read_csv("a,b,c\n1,2,.", na = ".")
 ```
 
@@ -1063,6 +933,77 @@ flights2 %>%
 
 ###5.6.3 Filtering Joins 
 ```{r}
+#Filtering joins 
+top_dest <- flights %>%
+  count(dest, sort = TRUE) %>%
+  head(10)
+top_dest
 
+#Constructing a filter 
+flights %>% 
+  filter(dest %in% top_dest$dest)
+
+#Using a semi_join which connects two tables (only keeps the rows in x that have a match in y)
+flights %>% 
+  semi_join(top_dest)
+
+#Anti_join are the inverse of semi_joins they keep rows without matches. Great for diagnosing mismatches in a dataset. 
+flights %>%
+  anti_join(planes, by = "tailnum") %>%
+  count(tailnum, sort = TRUE)
+
+
+
+```
+
+##5.7 Pipes for more readable workflows 
+Pipes are a tool that allow us to elegantly code data wrangling steps into a series of sequential actions on a single data frame. 
+
+```{r}
+library(magrittr)
+
+#Adding in a dataset
+foo_foo <- little_bunny()
+
+#saving each step as a new object 
+foo_foo_1 <- hop(foo_foo, through = forest)
+foo_foo_2 <- scoop(foo_foo_1, up = field_mice)
+foo_foo_3 <- bop(foo_foo_2, on = head)
+
+#Overwriting the original object instead of creating intermediate objects at each step
+foo_foo <- hop(foo_foo, through = forest)
+foo_foo <- scoop(foo_foo, up = field_mice)
+foo_foo <- bop(foo_foo, on = head)
+
+#string the function calls together 
+bop(
+  scoop(
+    hop(foo_foo, through = forest),
+    up = field_mice
+  ), 
+  on = head
+)
+
+#Use a pipe 
+foo_foo %>%
+  hop(through = forest) %>%
+  scoop(up = field_mice) %>%
+  bop(on = head)
+
+#pipe wont work for two classes of functions 
+#1. functions that use the current environment Assign()
+assign("x", 10)
+
+"x" %>% assign(100)
+x
+
+env <- environment()
+"x" %>% assign(100, envir = env)
+x
+#2. Functions that use lazy evaluation 
+tryCatch(stop("!"), error = function(e) "An error")
+
+stop("!") %>% 
+  tryCatch(error = function(e) "An error")
 ```
 

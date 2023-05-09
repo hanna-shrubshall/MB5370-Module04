@@ -975,3 +975,94 @@ flights %>%
 ###5.6.2 Mutating joins 
 Mutating a join allows you to combine variables from two tables. 
 - it first matches variables by their keys, then copies across variables from one table to the other. 
+
+```{r}
+#Narrow subset of data 
+flights2 <- flights %>% 
+  select(year:day, hour, origin, dest, tailnum, carrier)
+
+#Use of left_join function 
+flights2 %>%
+  select(-origin, -dest) %>% 
+  left_join(airlines, by = "carrier")
+
+#Use of mutate function (creates the same result as previous code)
+flights2 %>%
+  select(-origin, -dest) %>% 
+  mutate(name = airlines$name[match(carrier, airlines$carrier)])
+
+#Dive into how mutating joins work in detail
+x <- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     3, "x3"
+)
+y <- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2",
+     4, "y3"
+)
+
+
+#output of an inner join containing the key, x & y values
+x %>% 
+  inner_join(y, by = "key")
+
+
+#outer join keeps observations that appear in at least one of the tables, there are 3 types: left_join(keeps all observations in x), right_join(keeps all observations in y), full_join(keeps all observations in x and y)
+x <- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     2, "x3",
+     1, "x4"
+)
+y <- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2"
+)
+left_join(x, y, by = "key")
+
+#Both tables have duplicate keys, which is usually an error. When you join duplicated keys, you get all possible combinations = the Cartesian product: 
+x <- tribble(
+  ~key, ~val_x,
+     1, "x1",
+     2, "x2",
+     2, "x3",
+     3, "x4"
+)
+y <- tribble(
+  ~key, ~val_y,
+     1, "y1",
+     2, "y2",
+     2, "y3",
+     3, "y4"
+)
+left_join(x, y, by = "key")
+
+#Using the function by to join tables 
+flights2 %>% 
+  left_join(weather)
+
+flights2 %>% 
+  left_join(planes, by = "tailnum")
+
+
+#specifying what point you want to join 
+flights2 %>% 
+  left_join(airports, c("dest" = "faa"))
+
+flights2 %>% 
+  left_join(airports, c("origin" = "faa"))
+
+
+```
+
+###5.6.3 Filtering Joins 
+```{r}
+
+```
+

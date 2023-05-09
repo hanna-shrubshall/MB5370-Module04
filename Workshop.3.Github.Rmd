@@ -617,8 +617,13 @@ library(tidyverse)
 
 ###5.5.1 Tiday data 
 There are many ways to display a given data set, but not every way is easy to use for analysis. Note that in the example below, only table1 is “tidy”.
+How we make our dataset a tidy dataset is by following three interrelated rules. 
+1. Each variable must have its own column.
+2. Each observation must have its own row.
+3. Each value must have its own cell.
 
 ```{r}
+#inputting all the data tables 
 table1
 
 table2
@@ -628,16 +633,8 @@ table3
 table4a
 
 table4b
-```
 
-How we make our dataset a tidy dataset is by following three interrelated rules. 
-1. Each variable must have its own column.
-2. Each observation must have its own row.
-3. Each value must have its own cell.
-
- Here are some examples of how you might work with tidy table1 from the previous example.	
- 
-```{r}
+#examples of how you might work with tidy for table1
 table1 %>% 
   mutate(rate = cases / population * 10000)
 
@@ -649,7 +646,8 @@ ggplot(table1, aes(year, cases)) +
   geom_line(aes(group = country), colour = "grey50") + 
   geom_point(aes(colour = country))
 ```
- 
+
+
 ###5.5.2 Spreading and gathering data tables 
 Common problems with untidy data: 
 1. One variable is spread across multiple columns
@@ -657,40 +655,30 @@ Common problems with untidy data:
 - to fix said problems the following to functions will be used 
 1. pivot_longer() A common problem is a dataset has some column names that are not the names of the variables, but the values of the variables
 
-Example below: 
-
 ```{r}
+#example table
 table4a
-```
 
-To tidy this type of dataset: 
-- The set of columns whose names are values, not variables. In this example, those are the columns 1999 and 2000.
-- The name of the variable to move the column names to. Here it is year.
-- The name of the variable to move the column values to. Here it’s cases.
+#To tidy this type of dataset: 
+#- The set of columns whose names are values, not variables. In this example, those are the columns 1999 and 2000.
+#- The name of the variable to move the column names to. Here it is year.
+#- The name of the variable to move the column values to. Here it’s cases.
 
-Example of using picot_longer()
-
-```{r}
+#Using pivot_longer()
 table4a %>% 
   pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
-```
 
-```{r}
 table4b %>% 
   pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
-```
-COmbinning the tidied versions of table 4a + 4b into a single tibble 
 
-```{r}
+#Combinning the tidied versions of table 4a + 4b into a single tibble 
 tidy4a <- table4a %>% 
   pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
 tidy4b <- table4b %>% 
   pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
 left_join(tidy4a, tidy4b)
-```
 
-2. pivot_wider()
-```{r}
+#pivot_wider()
 table2
 
 table2 %>%
@@ -702,55 +690,42 @@ In table 3, there is one column (rate) that has two variables (cases & populatio
 
 Example below: 
 ```{r}
+#example
 table3
 
+#this separates the data into cases and population 
 table3 %>% 
-  separate(rate, into = c("cases", "population"))#this separates the data into cases and population 
+  separate(rate, into = c("cases", "population"))
 
-
+#Both cases and population are listed as character types. This is a default, the values in these columns are actually numbers so we need to convert them to better types by using convert=TRUE
 table3 %>% 
-  separate(rate, into = c("cases", "population"), convert = TRUE)#Both cases and population are listed as character types. This is a default, the values in these columns are actually numbers so we need to convert them to better types by using convert=TRUE
+  separate(rate, into = c("cases", "population"), convert = TRUE)
 
-
+#Can also pass a vector of integers to sep. separate() will interpret the integers as positions to split at. 
 table3 %>% 
   separate(year, into = c("century", "year"), sep = 2)
-#Can also pass a vector of integers to sep. separate() will interpret the integers as positions to split at. 
 
-
-```
-Can perform the inverse of separate by using unite() to combine multiple columns into a single column. 
-- unite() takes a data frame, the name of the new variable and a set of columns to combine using dplyr::select(). 
-
-```{r}
+#Can perform the inverse of separate by using unite() to combine multiple columns into a single column.
 table5 %>% 
   unite(new, century, year, sep = "")
 ```
+
 ###5.5.4 Handling missing values 
-
 Missing values are either blank or generally filled by NA. 
-Example, below has two points that have missing values: 
-
+*NOTE, an "NA" (explicit absence) indicates the presence of absent data. A "blank cell" just indicates the absence of data (implicit absence). 
 ```{r}
+#Example dataset missing two values
 stocks <- tibble(
   year   = c(2015, 2015, 2015, 2015, 2016, 2016, 2016),
   qtr    = c(   1,    2,    3,    4,    2,    3,    4),
   return = c(1.88, 0.59, 0.35,   NA, 0.92, 0.17, 2.66)
 )
-```
 
-*NOTE, an "NA" (explicit absence) indicates the presence of absent data. A "blank cell" just indicates the absence of data (implicit absence). 
-
-Example, below making implicit values explicit: 
-
-```{r}
+#below making implicit values explicit
 stocks %>% 
   pivot_wider(names_from = year, values_from = return)
-```
 
-The explicit missing claues may not be important in other representations of the data, hence you can set values_drop_na=TRUE in pivot_longer() to turn explicit values implicit
-
-Example, below: 
-```{r}
+#The explicit missing claues may not be important in other representations of the data, hence you can set values_drop_na=TRUE in pivot_longer() to turn explicit values implicit
 stocks %>% 
   pivot_wider(names_from = year, values_from = return) %>% 
   pivot_longer(
@@ -759,22 +734,14 @@ stocks %>%
     values_to = "return", 
     values_drop_na = TRUE
   )
-```
 
-Another function that can be used is the complete() function. This taks a set of columns and finds all the unique combinations and then ensures the original dataset contains all of those values, including filling in explicit NA where needed. 
-
-```{r}
+#Using the complete function - This taks a set of columns and finds all the unique combinations and then ensures the original dataset contains all of those values, including filling in explicit NA where needed.
 stocks
 
 stocks %>% 
   complete(year, qtr)
-```
 
-Similarly, the fill() function can be used to fill in the missing values that were meant to be carried forward. 
-
-Example, below: 
-
-```{r}
+#Similarly, the fill() function can be used to fill in the missing values that were meant to be carried forward. 
  treatment <- tribble(
   ~ person,           ~ treatment, ~response,
   "Derrick Whitmore", 1,           7,
@@ -787,18 +754,17 @@ treatment
 treatment %>% 
   fill(person)
 ```
+ 
 
 ##5.6 Learning relational data
 Relations are defined between a pair of tables. All other relations are built up from this simple idea: the relations of three or more tables are always a property of the relations between each pair. Sometimes both elements of a pair can be the same table! This is needed if, for example, you have a table of people, and each person has a reference to their parents.
+*NOTE, nycflights13 contains 4 tibbles that are related to flights. 
 
 ```{r}
 library(tidyverse)
 library(nycflights13)
-```
 
-*NOTE, nycflights13 contains 4 tibbles that are related to flights. 
-
-```{r}
+#datasets 
 airlines #airlines lets you look up the full carrier name from its abbreviated code
 
 airports #airports give information about each airport, identified by the faa airport code
@@ -806,8 +772,6 @@ airports #airports give information about each airport, identified by the faa ai
 planes #gives information about each plane, identified by its tailnum
 
 weather #gives the weather at each NYC airport for each hour 
-
-
 ```
 
 ###5.6.1 Joining datasets 
@@ -957,8 +921,7 @@ flights %>%
 ```
 
 ##5.7 Pipes for more readable workflows 
-Pipes are a tool that allow us to elegantly code data wrangling steps into a series of sequential actions on a single data frame. 
-
+Pipes are a tool that allow us to elegantly code data wrangling steps into a series of sequential actions on a single data frame.
 ```{r}
 library(magrittr)
 

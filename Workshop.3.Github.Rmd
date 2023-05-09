@@ -545,5 +545,433 @@ This is the function that saves this 'version' of your repo into your repository
 This is the function that pushes your changes to the remote server 
 -It's best practice to commit and push your code at the same time
 
+------------------------------------------------------------------------
+##5.0 Workshop 4: Data Wrangling in R
+- A tibble is a data frame that is slightly adjusted to help users keep up with the evolving applications of R. 
+- Tibbles are different to R's built-in data frame which will be called data.frame S. 
+- The tibble package is part of the tidyverse package 
+
+##5.3 WHat is a tibble? 
+
+```{r}
+library("tidyverse")
+```
+- R packages use regular data frames. To turn said regular data frames into tibbles you can use the function as_tibble(). 
+
+```{r}
+as_tibble(iris)
+```
+
+- You can also create a new tibble from individual vectors using tibble(). This will automatically recycle inputs of length 1, and allows you to refer to variables that you just created. 
+
+*NOTE, tibble() does not change input types, names of variables or create row names
+Example below: 
+
+```{r}
+tibble(
+  x = 1:5, 
+  y = 1, 
+  z = x ^ 2 + y
+)
+```
+
+Tibbles can have non-syntactic names (which aren't valied in R).
+- For example names with spaces or containing special characters
+If there are non-syntatic variables in your tibble, you'll need to refer to them  with backsticks. 
+*NOTE, you'll need these backsticks for these variables when using other packages such as ggplot2, dplyr, tidyr, etc. 
+Example below: 
+
+```{r}
+tb <- tibble(
+  `:)` = "smile",
+  ` ` = "space", 
+  `2000` = "number"
+)
+tb
+
+```
+
+Another way to create a tibble is with the function tribble() (meaning transposed tibble). 
+- This is a customised way for data entry in code: column headings are defined by formulas, and entries are separated by commas
+Example below: 
+
+```{r}
+tribble(
+   ~x, ~y, ~z,
+  #Header
+  "a", 2, 3.6,
+  "b", 1, 8.5
+)
+```
+
+What is the difference between tibbles and data.frame? 
+- Tibbles print the first 10 rows and all columns that can fit on screen 
+- Tibbles also print the type of each data next to its name (character, string, numeric, etc). 
+- Tibbles help your console from getting overwhelmed by printing massive data frames. 
+
+```{r}
+tibble(
+  a = lubridate::now() + runif(1e3) * 86400,
+  b = lubridate::today() + runif(1e3) * 30,
+  c = 1:1e3,
+  d = runif(1e3),
+  e = sample(letters, 1e3, replace = TRUE)
+)
+```
+
+However, sometimes you need to alter the default display. 
+- Print() can be used to designate the number of ros (n) and display width (width = Inf #displays every column). 
+
+Example below: 
+
+```{r}
+install.packages("nycflights13")
+library("nycflights13")
+nycflights13::flights %>% 
+  print(n = 10, width = Inf)
+```
+
+You can also control the default print behaviour by setting options: 
+- options(tibble.print_max = n, tibble.print_min = m): if more then n rows, print only m rows
+- Use options(tibble.print_min = Inf) to always show all rows.
+-Use options(tibble.width = Inf) to always print all columns, regardless of the width of the screen.
+-Use R’s built-in viewer with View()
+-You can see a complete list of options by looking at the package help with package?tibble.
+
+SOme tools are needed for pulling out single variables from our data frame. [[ extracts by name or position and $ extracts only by name. 
+
+Example below: 
+
+```{r}
+df <- tibble(
+  x = runif(5),
+  y = rnorm(5)
+)
+
+# Extract by name
+df$x
+
+df[["x"]]
+
+# Extract by position
+df[[1]]
+
+```
+
+Need to use a . as a place holder if we want to use these tools in a pipe (%>%). 
+Example below: 
+
+```{r}
+df %>% .$x
+df %>% .[["x"]]
+```
+
+Compare and contrast the following operations on a data.frame and equivalent tibble. What is different? Why might the default data frame behaviours cause you frustration?
+
+```{r}
+df <- data.frame(abc = 1, xyz = "a")
+df$x
+df[, "xyz"]
+df[, c("abc", "xyz")]
+```
+
+```{r}
+df <- tibble(abc = 1, xyz = "a")
+df$x
+df[, "xyz"]
+df[, c("abc", "xyz")]
+```
 
 
+##5.4 How can I import data? 
+- read_csv() reads comma delimited files
+- read_csv2() reads semicolon separated files 
+- read_tsv() reads tab delimited files 
+- read_delim() reads in files with any delimiter
+- read_fwf() reads fixed width files. You can specify fields with their widths with either fwf_widths() or position with fwf_positions()
+- read_table reads a common variation of fixed width files where columns are separated by white space. 
+- read_log() reads Apache style log files 
+
+Most important argument to read_csv() is the file path.
+- when you run read_csv() it prints out a column specification that gives the name and type of each column 
+
+```{r}
+read_csv("a,b,c
+1,2,3
+4,5,6")
+```
+*NOTE read_csv() uses the first line of data as the column names 
+
+You may not want the first line of data to be the column names hence you might want to skip these lines. 
+- Use function skip = n (where n is the number of lines you want to skip over). 
+- Alternativey, use comment = '#' it will drop all lines starting with a # or whatever character you designate 
+
+```{r}
+read_csv("The first line of metadata
+  The second line of metadata
+  x,y,z
+  1,2,3", skip = 2)
+
+read_csv("# A comment I want to skip
+  x,y,z
+  1,2,3", comment = "#")
+```
+
+Another reason to adjust the read_csv() default is if your data does not have column names. 
+- Use col_names = FALSE (this tells read_csv() not to treat the first row as headings, but to label them sequentially instead from X1 to Xn)
+
+*NOTE \n is a shortcut to add a new line
+
+Example below: 
+
+```{r}
+read_csv("1,2,3\n4,5,6", col_names = FALSE)
+```
+
+You can also pass col_names a character vector to be used as the column names:
+
+```{r}
+read_csv("1,2,3\n4,5,6", col_names = c("Bob", "Charlie", "Sam"))
+```
+
+Another option that commonly needs tweaking is na: this specifies the value (or values) that are used to represent missing values in your file:
+
+```{r}
+read_csv("a,b,c\n1,2,.", na = ".")
+```
+
+##5.5 Tidying data using Tidyr
+```{r}
+library(tidyverse)
+```
+
+###5.5.1 Tiday data 
+There are many ways to display a given data set, but not every way is easy to use for analysis. Note that in the example below, only table1 is “tidy”.
+
+```{r}
+table1
+
+table2
+
+table3
+
+table4a
+
+table4b
+```
+
+How we make our dataset a tidy dataset is by following three interrelated rules. 
+1. Each variable must have its own column.
+2. Each observation must have its own row.
+3. Each value must have its own cell.
+
+ Here are some examples of how you might work with tidy table1 from the previous example.	
+ 
+```{r}
+table1 %>% 
+  mutate(rate = cases / population * 10000)
+
+table1 %>% 
+  count(year, wt = cases)
+
+library(ggplot2)
+ggplot(table1, aes(year, cases)) + 
+  geom_line(aes(group = country), colour = "grey50") + 
+  geom_point(aes(colour = country))
+```
+ 
+###5.5.2 Spreading and gathering data tables 
+Common problems with untidy data: 
+1. One variable is spread across multiple columns
+2. One observation is scattered across multiple rows
+- to fix said problems the following to functions will be used 
+1. pivot_longer() A common problem is a dataset has some column names that are not the names of the variables, but the values of the variables
+
+Example below: 
+
+```{r}
+table4a
+```
+
+To tidy this type of dataset: 
+- The set of columns whose names are values, not variables. In this example, those are the columns 1999 and 2000.
+- The name of the variable to move the column names to. Here it is year.
+- The name of the variable to move the column values to. Here it’s cases.
+
+Example of using picot_longer()
+
+```{r}
+table4a %>% 
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
+```
+
+```{r}
+table4b %>% 
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
+```
+COmbinning the tidied versions of table 4a + 4b into a single tibble 
+
+```{r}
+tidy4a <- table4a %>% 
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "cases")
+tidy4b <- table4b %>% 
+  pivot_longer(c(`1999`, `2000`), names_to = "year", values_to = "population")
+left_join(tidy4a, tidy4b)
+```
+
+2. pivot_wider()
+```{r}
+table2
+
+table2 %>%
+    pivot_wider(names_from = type, values_from = count)
+```
+
+###5.5.3 Seperating and uniting data tables 
+In table 3, there is one column (rate) that has two variables (cases & population). To address this you can use the function separate(), which seperates one column into multiple columns. 
+
+Example below: 
+```{r}
+table3
+
+table3 %>% 
+  separate(rate, into = c("cases", "population"))#this separates the data into cases and population 
+
+
+table3 %>% 
+  separate(rate, into = c("cases", "population"), convert = TRUE)#Both cases and population are listed as character types. This is a default, the values in these columns are actually numbers so we need to convert them to better types by using convert=TRUE
+
+
+table3 %>% 
+  separate(year, into = c("century", "year"), sep = 2)
+#Can also pass a vector of integers to sep. separate() will interpret the integers as positions to split at. 
+
+
+```
+Can perform the inverse of separate by using unite() to combine multiple columns into a single column. 
+- unite() takes a data frame, the name of the new variable and a set of columns to combine using dplyr::select(). 
+
+```{r}
+table5 %>% 
+  unite(new, century, year, sep = "")
+```
+###5.5.4 Handling missing values 
+
+Missing values are either blank or generally filled by NA. 
+Example, below has two points that have missing values: 
+
+```{r}
+stocks <- tibble(
+  year   = c(2015, 2015, 2015, 2015, 2016, 2016, 2016),
+  qtr    = c(   1,    2,    3,    4,    2,    3,    4),
+  return = c(1.88, 0.59, 0.35,   NA, 0.92, 0.17, 2.66)
+)
+```
+
+*NOTE, an "NA" (explicit absence) indicates the presence of absent data. A "blank cell" just indicates the absence of data (implicit absence). 
+
+Example, below making implicit values explicit: 
+
+```{r}
+stocks %>% 
+  pivot_wider(names_from = year, values_from = return)
+```
+
+The explicit missing claues may not be important in other representations of the data, hence you can set values_drop_na=TRUE in pivot_longer() to turn explicit values implicit
+
+Example, below: 
+```{r}
+stocks %>% 
+  pivot_wider(names_from = year, values_from = return) %>% 
+  pivot_longer(
+    cols = c(`2015`, `2016`), 
+    names_to = "year", 
+    values_to = "return", 
+    values_drop_na = TRUE
+  )
+```
+
+Another function that can be used is the complete() function. This taks a set of columns and finds all the unique combinations and then ensures the original dataset contains all of those values, including filling in explicit NA where needed. 
+
+```{r}
+stocks
+
+stocks %>% 
+  complete(year, qtr)
+```
+
+Similarly, the fill() function can be used to fill in the missing values that were meant to be carried forward. 
+
+Example, below: 
+
+```{r}
+ treatment <- tribble(
+  ~ person,           ~ treatment, ~response,
+  "Derrick Whitmore", 1,           7,
+  NA,                 2,           10,
+  NA,                 3,           9,
+  "Katherine Burke",  1,           4
+)
+treatment
+
+treatment %>% 
+  fill(person)
+```
+
+##5.6 Learning relational data
+Relations are defined between a pair of tables. All other relations are built up from this simple idea: the relations of three or more tables are always a property of the relations between each pair. Sometimes both elements of a pair can be the same table! This is needed if, for example, you have a table of people, and each person has a reference to their parents.
+
+```{r}
+library(tidyverse)
+library(nycflights13)
+```
+
+*NOTE, nycflights13 contains 4 tibbles that are related to flights. 
+
+```{r}
+airlines #airlines lets you look up the full carrier name from its abbreviated code
+
+airports #airports give information about each airport, identified by the faa airport code
+
+planes #gives information about each plane, identified by its tailnum
+
+weather #gives the weather at each NYC airport for each hour 
+
+
+```
+
+###5.6.1 Joining datasets 
+To join datasets together you need to identify the keys.
+- A key is a variable (or set of variables) that uniquely identifies an observation. 
+
+- There are two types of keys
+  1. Primary key, uniquely identifies an observation in its own table
+  2. Foreign key, uniquely identifies an observation in another table
+  
+- Once the primary keys have been identified in your table, its good practice to verify that they do indeed uniquely identify each observation. Using the function count(). 
+
+*NOTE, if a table lacks a primary key, you can add one with mutate() and row_number()
+
+```{r}
+#Tables 
+planes %>% 
+  count(tailnum) %>% 
+  filter(n > 1)
+
+weather %>% 
+  count(year, month, day, hour, origin) %>% 
+  filter(n > 1)
+
+flights %>% 
+  count(year, month, day, flight) %>% 
+  filter(n > 1)
+
+#the key is tailnumber not flights
+flights %>% 
+  count(year, month, day, tailnum) %>% 
+  filter(n > 1)
+```
+
+###5.6.2 Mutating joins 
+Mutating a join allows you to combine variables from two tables. 
+- it first matches variables by their keys, then copies across variables from one table to the other. 

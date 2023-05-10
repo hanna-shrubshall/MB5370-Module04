@@ -976,10 +976,11 @@ stop("!") %>%
 ##6.4 Installing the spatial R packages 
 ```{r}
 #install necessary packages
-install.packages("sf")
-install.packages("terra")
-install.packages("leaflet")
-install.packages("tmap")
+#install.packages("sf")
+#install.packages("terra")
+#install.packages("leaflet")
+#install.packages("tmap")
+
 #load into R library
 library(tidyverse)
 library(sf)
@@ -996,7 +997,7 @@ https://www.seascapemodels.org/spatial-analysis-in-r/spatial-analysis-in-r.html)
 ```{r}
 #load the copepod data into R studio
 library(readr)
-dat <- read_csv("data-for-course/copepods_raw.csv")
+dat <- read_csv("E:/github (1)/github/MB5370-Module04/data/data-for-course/copepods_raw.csv")
 dat
 ```
 
@@ -1004,8 +1005,170 @@ dat
 ###6.7.1 Check Coordinates 
 ```{r}
 library(ggplot2)
+
+#first plot of the coordinates 
 ggplot(dat) + 
   aes(x = longitude, y = latitude, color = richness_raw) +
   geom_point()
+
+#Looking at richness data (main variable for analysis)
+ggplot(dat, aes(x = latitude, y = richness_raw)) + 
+  stat_smooth() + 
+  geom_point()
+```
+##6.8 Getting going with maps 
+```{r}
+#Turn the data into a simple features collection 
+sdat <- st_as_sf(dat, coords = c("longitude", "latitude"), 
+                 crs = 4326)
+```
+
+##6.9 Coordinate systems 
+```{r}
+#Coordinate system 
+crs4326 <- st_crs(4326)
+crs4326 # look at the whole CRS
+crs4326$Name # pull out just the name of the crs
+
+
+#Looking at the WKT 
+crs4326$wkt # crs in well-known text format
+```
+
+##6.10 Feature collection (points)
+```{r}
+#Looking at what the sdat created 
+sdat
+
+#NOTE this is similar to a shapefile 
+```
+
+##6.11 Cartography 
+```{r}
+#mapping the data
+plot(sdat["richness_raw"])
+
+#Plotting sdat, creates a panel for every variable in the dataframe 
+plot(sdat)
+```
+
+##6.12 Thematic maps for communication 
+```{r}
+#Using tmap 
+tm_shape(sdat) + 
+  tm_dots(col = "richness_raw")
+
+#Using tamp_save() to save the map to the working directory 
+tmap_save(tm1, filename = "Richness-map.png", 
+          width = 600, height = 600)
+```
+
+##6.13. Mapping and spatial polygons as layers 
+
+###6.13.1 Loading shapefiles 
+```{r}
+#reading course shape file 
+aus <- st_read("E:/github (1)/github/MB5370-Module04/data/data-for-course/spatial-data/Aussie/Aussie.shp")
+
+#reading aus_shelf shape file 
+shelf <- st_read("E:/github (1)/github/MB5370-Module04/data/data-for-course/spatial-data/aus_shelf/aus_shelf.shp")
+
+#Checking the data 
+aus
+```
+###6.13.2 Mapping your polygons 
+```{r}
+#this creates the map of Australia 
+tm_shape(shelf) + 
+  tm_polygons()
+
+#bbox expands the extent of the map so all data points are detected 
+tmap_mode("view")+
+tm_shape(shelf, bbox = sdat) +
+  tm_polygons() +
+   tm_borders("white", lwd = .5)
+  tm_shape(aus) + 
+  tm_polygons() + 
+  tm_shape(sdat) + 
+  tm_dots(col = "purple")+
+    tm_basemap("Esri.WorldImagery") +  tm_tiles("Stamen.TonerLabels", ) 
+  
+
+```
+
+##6.14 Exploring t_map 
+```{r}
+vignette('tmap-getstarted')
+
+#Exercise to learn about accessing nice colour schemes such as virids: 
+
+#loading required packages 
+# for loading our data
+library(raster)
+library(readr)
+library(readxl)
+library(sf)
+# for datasets
+#install.packages("maps")
+#install.packages("spData")
+library(maps)
+library(spData)
+# for creating animations
+#install.packages("magick")
+library(magick)
+# for plotting
+#install.packages("grid")
+#install.packages("viridis")
+library(grid)
+library(tmap)
+library(viridis)
+
+#Loading the data required 
+# load shapefile for bavaria
+bavaria <- read_sf("E:/github (1)/github/MB5370-Module04/data/bavaria.shp")
+# load raster file for europe
+europe_raster <- raster("E:/github (1)/github/MB5370-Module04/data/elevation1x1_new.tif")
+# load shapefile for world
+world_shape <- read_sf("E:/github (1)/github/MB5370-Module04/data/ne_50m_admin_0_countries.shp")
+
+# keep only europe
+europe_shape <- world_shape[world_shape$CONTINENT == "Europe",]
+
+# use world.cities from the maps package
+# keep only cities with at least 1 million inhabitants
+cities <- world.cities[world.cities$pop >= 1000000, ]
+
+# turn it into an sf object
+cities <- cities %>%
+  st_as_sf(coords = c("long", "lat"), crs = 4326) %>%
+  st_cast("POINT")
+
+# keep only the cities that are in europe
+cities <- st_intersection(cities, st_union(europe_shape))
+
+# turn the europe object into a MULTILINESTRING
+europe_shape <- st_cast(europe_shape, "MULTILINESTRING")
+communities <- read_sf("gmd_ex.shp")
+
+# keep only the ones in rosenheim
+rosenheim <- communities[communities$BEZ_KRS == "Rosenheim", ]
+
+# load the csv file for honey production in the us
+honey_csv <- read_csv("honeyproduction.csv")
+
+# load the xlsx file for abbreviations of the us states
+abbrev <- read_xlsx("abbrev.xlsx")
+
+# load honey shapefile
+honey_sf <- read_sf("honey.shp")
+
+
+```
+
+
+##6.15 Exporting your map 
+```{r}
+#saving you map 
+tmap_save()
 ```
 

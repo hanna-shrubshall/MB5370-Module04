@@ -1085,83 +1085,13 @@ tm_shape(shelf) +
 #bbox expands the extent of the map so all data points are detected 
 tmap_mode("view")+
 tm_shape(shelf, bbox = sdat) +
-  tm_polygons() +
    tm_borders("white", lwd = .5)
   tm_shape(aus) + 
-  tm_polygons() + 
+  tm_polygons(alpha = 0, border.alpha = 1) + 
   tm_shape(sdat) + 
-  tm_dots(col = "purple")+
+  tm_dots(col = "route")+
     tm_basemap("Esri.WorldImagery") +  tm_tiles("Stamen.TonerLabels", ) 
   
-
-```
-
-##6.14 Exploring t_map 
-```{r}
-vignette('tmap-getstarted')
-
-#Exercise to learn about accessing nice colour schemes such as virids: 
-
-#loading required packages 
-# for loading our data
-library(raster)
-library(readr)
-library(readxl)
-library(sf)
-# for datasets
-#install.packages("maps")
-#install.packages("spData")
-library(maps)
-library(spData)
-# for creating animations
-#install.packages("magick")
-library(magick)
-# for plotting
-#install.packages("grid")
-#install.packages("viridis")
-library(grid)
-library(tmap)
-library(viridis)
-
-#Loading the data required 
-# load shapefile for bavaria
-bavaria <- read_sf("E:/github (1)/github/MB5370-Module04/data/bavaria.shp")
-# load raster file for europe
-europe_raster <- raster("E:/github (1)/github/MB5370-Module04/data/elevation1x1_new.tif")
-# load shapefile for world
-world_shape <- read_sf("E:/github (1)/github/MB5370-Module04/data/ne_50m_admin_0_countries.shp")
-
-# keep only europe
-europe_shape <- world_shape[world_shape$CONTINENT == "Europe",]
-
-# use world.cities from the maps package
-# keep only cities with at least 1 million inhabitants
-cities <- world.cities[world.cities$pop >= 1000000, ]
-
-# turn it into an sf object
-cities <- cities %>%
-  st_as_sf(coords = c("long", "lat"), crs = 4326) %>%
-  st_cast("POINT")
-
-# keep only the cities that are in europe
-cities <- st_intersection(cities, st_union(europe_shape))
-
-# turn the europe object into a MULTILINESTRING
-europe_shape <- st_cast(europe_shape, "MULTILINESTRING")
-communities <- read_sf("gmd_ex.shp")
-
-# keep only the ones in rosenheim
-rosenheim <- communities[communities$BEZ_KRS == "Rosenheim", ]
-
-# load the csv file for honey production in the us
-honey_csv <- read_csv("honeyproduction.csv")
-
-# load the xlsx file for abbreviations of the us states
-abbrev <- read_xlsx("abbrev.xlsx")
-
-# load honey shapefile
-honey_sf <- read_sf("honey.shp")
-
 
 ```
 
